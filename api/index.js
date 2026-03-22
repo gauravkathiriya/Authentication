@@ -28,13 +28,16 @@ app.post("/api/refresh", (req, res) => {
 
   //send error if there is no token or it's invalid
   if (!refreshToken) {
-    res.status(401).json("you are not Authenticated.!!");
+    return res.status(401).json("you are not Authenticated.!!");
   }
   if (!refreshTokens.includes(refreshToken)) {
-    res.status(401).json("Refresh Token is not valid!!");
+    return res.status(401).json("Refresh Token is not valid!!");
   }
   jwt.verify(refreshToken, "myRefreshSecretKey", (err, user) => {
-    err && console.log(err);
+    if (err) {
+      console.log(err);
+      return res.status(403).json("Token is not valid!");
+    }
     refreshTokens = refreshTokens.filter((token) => token !== refreshToken);
 
     const newAccessToknen = generateAccessToken(user);

@@ -118,4 +118,11 @@ app.post("/api/logout", verify, (req, res) => {
   res.status(200).json("you logOut Successfully.");
 });
 
-app.listen(5000, () => console.log("Backend server is running!"));
+if (require.main === module) {
+  app.listen(5000, () => console.log("Backend server is running!"));
+}
+
+module.exports = {
+  verify,
+  generateAccessToken,
+};

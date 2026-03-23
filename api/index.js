@@ -20,7 +20,7 @@ const users = [
   },
 ];
 
-let refreshTokens = [];
+const refreshTokens = new Set();
 
 app.post("/api/refresh", (req, res) => {
   //take the refresh token from the user
@@ -43,7 +43,7 @@ app.post("/api/refresh", (req, res) => {
     const newAccessToknen = generateAccessToken(user);
     const newRefreshAccessToknen = generateRefreshToken(user);
 
-    refreshTokens.push(newRefreshAccessToknen);
+    refreshTokens.add(newRefreshAccessToknen);
 
     res.status(200).json({
       accessToken: newAccessToknen,
@@ -74,7 +74,7 @@ app.post("/api/login", (req, res) => {
     // Generate JWT
     const accessToken = generateAccessToken(user);
     const refreshToken = generateRefreshToken(user);
-    refreshTokens.push(refreshToken);
+    refreshTokens.add(refreshToken);
 
     res.json({
       username: user.username,
@@ -114,8 +114,15 @@ app.delete("/api/users/:userId", verify, (req, res) => {
 
 app.post("/api/logout", verify, (req, res) => {
   const refreshToken = req.body.token;
-  refreshTokens = refreshTokens.filter((token) => token !== refreshToken);
+  refreshTokens.delete(refreshToken);
   res.status(200).json("you logOut Successfully.");
 });
 
-app.listen(5000, () => console.log("Backend server is running!"));
+if (require.main === module) {
+  app.listen(5000, () => console.log("Backend server is running!"));
+}
+
+module.exports = {
+  verify,
+  generateAccessToken,
+};

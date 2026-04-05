@@ -1,6 +1,9 @@
 const { verify, generateAccessToken } = require("./index");
 const jwt = require("jsonwebtoken");
 
+process.env.JWT_ACCESS_SECRET = "testAccessSecret";
+process.env.JWT_REFRESH_SECRET = "testRefreshSecret";
+
 describe("verify middleware", () => {
   let req, res, next;
 

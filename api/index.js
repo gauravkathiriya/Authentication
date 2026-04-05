@@ -1,6 +1,12 @@
 const express = require("express");
 const app = express();
 const jwt = require("jsonwebtoken");
+
+try {
+  process.loadEnvFile();
+} catch (error) {
+  console.log(".env file not found, skipping...");
+}
 app.use(express.json());
 const cors = require("cors");
 app.use(cors());
@@ -33,7 +39,7 @@ app.post("/api/refresh", (req, res) => {
   if (!refreshTokens.has(refreshToken)) {
     return res.status(401).json("Refresh Token is not valid!!");
   }
-  jwt.verify(refreshToken, "myRefreshSecretKey", (err, user) => {
+  jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET, (err, user) => {
     if (err) {
       console.log(err);
       return res.status(403).json("Refresh Token is not valid!");
@@ -54,13 +60,13 @@ app.post("/api/refresh", (req, res) => {
 });
 
 const generateAccessToken = (user) => {
-  return jwt.sign({ id: user.id, isAdmin: user.isAdmin }, "mySecretKey", {
+  return jwt.sign({ id: user.id, isAdmin: user.isAdmin }, process.env.JWT_ACCESS_SECRET, {
     expiresIn: "15s",
   });
 };
 
 const generateRefreshToken = (user) => {
-  return jwt.sign({ id: user.id, isAdmin: user.isAdmin }, "myRefreshSecretKey");
+  return jwt.sign({ id: user.id, isAdmin: user.isAdmin }, process.env.JWT_REFRESH_SECRET);
 };
 
 app.post("/api/login", (req, res) => {
@@ -92,7 +98,7 @@ const verify = (req, res, next) => {
 
   if (authHeader) {
     const token = authHeader.split(" ")[1];
-    jwt.verify(token, "mySecretKey", (err, user) => {
+    jwt.verify(token, process.env.JWT_ACCESS_SECRET, (err, user) => {
       if (err) {
         return res.status(403).json("Token is not valid!");
       }

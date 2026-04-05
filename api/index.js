@@ -30,7 +30,7 @@ app.post("/api/refresh", (req, res) => {
   if (!refreshToken) {
     return res.status(401).json("you are not Authenticated.!!");
   }
-  if (!refreshTokens.includes(refreshToken)) {
+  if (!refreshTokens.has(refreshToken)) {
     return res.status(401).json("Refresh Token is not valid!!");
   }
   jwt.verify(refreshToken, "myRefreshSecretKey", (err, user) => {
@@ -38,16 +38,16 @@ app.post("/api/refresh", (req, res) => {
       console.log(err);
       return res.status(403).json("Refresh Token is not valid!");
     }
-    refreshTokens = refreshTokens.filter((token) => token !== refreshToken);
+    refreshTokens.delete(refreshToken);
 
-    const newAccessToknen = generateAccessToken(user);
-    const newRefreshAccessToknen = generateRefreshToken(user);
+    const newAccessToken = generateAccessToken(user);
+    const newRefreshToken = generateRefreshToken(user);
 
-    refreshTokens.add(newRefreshAccessToknen);
+    refreshTokens.add(newRefreshToken);
 
     res.status(200).json({
-      accessToken: newAccessToknen,
-      refreshToken: newRefreshAccessToknen,
+      accessToken: newAccessToken,
+      refreshToken: newRefreshToken,
     });
   });
   //if everything is ok, create new access token, refresh token and send to user
@@ -123,6 +123,7 @@ if (require.main === module) {
 }
 
 module.exports = {
+  app,
   verify,
   generateAccessToken,
 };

@@ -2,6 +2,10 @@ const { app, generateAccessToken } = require("./index");
 const jwt = require("jsonwebtoken");
 const axios = require("axios");
 
+// Ensure environment variables are set for the test
+process.env.JWT_ACCESS_SECRET = process.env.JWT_ACCESS_SECRET || "testAccessSecret";
+process.env.JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || "testRefreshSecret";
+
 describe("POST /api/refresh", () => {
   let server;
   const port = 5001;
